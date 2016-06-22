@@ -9,69 +9,10 @@ import {
   PanResponder,
   TouchableWithoutFeedback
 } from 'react-native';
+import Row from './Row';
+import SortRow from './SortRow';
 
 let HEIGHT = Dimensions.get('window').height;
-var Row = React.createClass({
-  shouldComponentUpdate: function(props) {
-    if (props.hovering !== this.props.hovering) return true;
-    if (props.active !== this.props.active) return true;
-    if (props.rowData.data !== this.props.rowData.data) return true;
-    return false;
-  },
-  handleLongPress: function(e) {
-    this.refs.view.measure((frameX, frameY, frameWidth, frameHeight, pageX, pageY) => {
-      let layout = {frameX, frameY, frameWidth, frameHeight, pageX, pageY};
-       this.props.onRowActive({
-        layout: layout,
-        touch: e.nativeEvent,
-        rowData: this.props.rowData
-      });
-    });
-  },
-  measure: function() {
-    return this.refs.view.measure.apply(this, Array.from(arguments));
-  },
-  render: function() {
-    let layout = this.props.list.layoutMap[this.props.rowData.index];
-    let activeData = this.props.list.state.active;
-
-    let activeIndex = activeData ? Number(activeData.rowData.index) : -5;
-    let shouldDisplayHovering = activeIndex !== this.props.rowData.index;
-    let Row = React.cloneElement(this.props.renderRow(this.props.rowData.data, this.props.rowData.section, this.props.rowData.index, null, this.props.active), {onLongPress: this.handleLongPress, onPressOut: this.props.list.cancel});
-    return <View onLayout={this.props.onRowLayout} style={this.props.active && this.props.list.state.hovering ? {height: 0, opacity: 0} : null} ref="view">
-          {this.props.hovering && shouldDisplayHovering ? this.props.activeDivider : null}
-          {this.props.active && this.props.list.state.hovering && this.props._legacySupport ? null : Row}
-        </View>
-  }
-});
-
-var SortRow = React.createClass({
-  getInitialState: function() {
-    let layout = this.props.list.state.active.layout;
-    let wrapperLayout = this.props.list.wrapperLayout;
-
-    return {
-      style: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        opacity: .2,
-        height: layout.frameHeight,
-        overflow: 'hidden',
-        backgroundColor: 'transparent',
-        marginTop: layout.pageY - wrapperLayout.pageY //Account for top bar spacing
-      }
-    }
-  },
-  render: function() {
-     let handlers = this.props.panResponder.panHandlers;
-    return <Animated.View ref="view" style={[this.state.style, this.props.sortRowStyle, this.props.list.state.pan.getLayout()]}>
-      <View style={{opacity: .85, flex: 1}}>
-        {this.props.renderRow(this.props.rowData.data, this.props.rowData.section, this.props.rowData.index, true)}
-      </View>
-      </Animated.View>
-  }
-});
 
 var SortableListView = React.createClass({
   mixins: [TimerMixin],
