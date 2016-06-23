@@ -173,7 +173,8 @@ const SortableListView = React.createClass({
   checkTargetElement() {
     const scrollValue = this.scrollValue;
     const moveY = this.moveY;
-    const targetPixel = scrollValue + moveY - this.wrapperLayout.pageY;
+    let targetPixel = scrollValue + moveY - this.wrapperLayout.pageY;
+    if (targetPixel < 0) targetPixel = 0;
     let i = 0;
     let x = 0;
     let row;
@@ -190,6 +191,7 @@ const SortableListView = React.createClass({
       x++;
     }
     if (!isLast) x--;
+    if (x < 0) x = 0;
     if (this.state.firstTime || x !== this.state.hovering) {
       LayoutAnimation.easeInEaseOut();
       this.setState({
